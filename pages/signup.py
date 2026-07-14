@@ -1,5 +1,5 @@
 import streamlit as st
-from app import signup_user, check_username_exists, check_email_exists, validate_password, verify_otp, is_valid_email, generate_otp, send_email
+from app import signup_user, check_username_exists, check_email_exists, validate_password, verify_otp, is_valid_email
 import time
 
 st.title("Sign Up")
@@ -43,29 +43,16 @@ if st.session_state.get('verify_otp'):
     otp = st.text_input("Enter OTP")
     
     is_expired = time.time() > st.session_state['temp_user']['otp']['expiry']
-    
-    col1, col2 = st.columns([1,4])
-    with col1:
-        verify_button = st.button("Verify OTP", disabled=is_expired)
-    with col2:
-        if is_expired:
-            if st.button("Resend OTP"):
-                otp_data = generate_otp()
-                email_content = f"""
-                <p>Hello {st.session_state['temp_user']['username']},</p>
-                <p>Here is your new OTP to verify your email address:</p>
-                <h1 style="text-align: center; color: #007bff; font-size: 36px; letter-spacing: 5px;">{otp_data['code']}</h1>
-                <p>This code will expire in 10 minutes.</p>
-                <p>For security reasons, please do not share this code with anyone.</p>
-                """
-                if send_email(st.session_state['temp_user']['email'], "Email Verification", email_content):
-                    st.session_state['temp_user']['otp'] = otp_data
-                    st.success("New OTP sent to your email")
-                    st.rerun()
-    
+
     if is_expired:
-        st.info("Your OTP has expired. Please use the Resend OTP button to get a new code.")
-    
+        for key in ['verify_otp', 'temp_user', 'otp_attempts']:
+            if key in st.session_state:
+                del st.session_state[key]
+        st.warning("Your OTP has expired and was cleared. Please sign up again to receive a new code.")
+        st.rerun()
+
+    verify_button = st.button("Verify OTP")
+
     if verify_button:
         success, message = verify_otp(otp)
         if success:

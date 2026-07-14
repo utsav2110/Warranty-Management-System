@@ -1,5 +1,5 @@
 import streamlit as st
-from app import check_email_exists, generate_otp, send_email, validate_password , is_valid_email
+from app import check_email_exists, generate_otp, send_email, validate_password , is_valid_email, get_otp_block
 import bcrypt
 from app import get_conn
 import time
@@ -25,10 +25,9 @@ if st.session_state['reset_step'] == 'email':
         otp = generate_otp()
         email_content = f"""
         <p>Hello,</p>
-        <p>We received a request to reset your password. Please use the following OTP to proceed:</p>
-        <h1 style="text-align: center; color: #007bff; font-size: 36px; letter-spacing: 5px;">{otp['code']}</h1>
-        <p>This code will expire in 10 minutes.</p>
-        <p>If you didn't request this, you can safely ignore this email.</p>
+        <p>We received a request to reset your password. Use the verification code below to proceed.</p>
+        {get_otp_block(otp['code'])}
+        <p style="font-size: 13px; color: #6b7280;">If you didn't request this, you can safely ignore this email.</p>
         """
         if send_email(email, "Password Reset Request", email_content):
             st.session_state['reset_otp'] = otp
@@ -43,29 +42,16 @@ elif st.session_state['reset_step'] == 'otp':
     otp = st.text_input("Enter OTP")
     
     is_expired = time.time() > st.session_state['reset_otp']['expiry']
-    
-    col1, col2 = st.columns([1,4])
-    with col1:
-        verify_button = st.button("Verify OTP", disabled=is_expired)
-    with col2:
-        if is_expired:
-            if st.button("Resend OTP"):
-                otp = generate_otp()
-                email_content = f"""
-                <p>Hello,</p>
-                <p>Here is your new OTP to reset your password:</p>
-                <h1 style="text-align: center; color: #007bff; font-size: 36px; letter-spacing: 5px;">{otp['code']}</h1>
-                <p>This code will expire in 10 minutes.</p>
-                <p>If you didn't request this, you can safely ignore this email.</p>
-                """
-                if send_email(st.session_state['reset_email'], "Password Reset Request", email_content):
-                    st.session_state['reset_otp'] = otp
-                    st.success("New OTP sent to your email")
-                    st.rerun()
-    
+
     if is_expired:
-        st.info("Your OTP has expired. Please use the Resend OTP button to get a new code.")
-    
+        for key in ['reset_step', 'reset_otp', 'reset_email', 'otp_attempts']:
+            if key in st.session_state:
+                del st.session_state[key]
+        st.warning("Your OTP has expired and was cleared. Please start the password reset again.")
+        st.rerun()
+
+    verify_button = st.button("Verify OTP")
+
     if verify_button:
         if st.session_state['otp_attempts'] >= 3:
             st.error("Maximum attempts reached. Please start over.")

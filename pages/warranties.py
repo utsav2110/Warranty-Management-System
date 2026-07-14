@@ -1,8 +1,8 @@
 import streamlit as st
-from app import get_all_warranties, search_warranties, generate_warranty_pdf, check_expiring_warranties, Image, io, CATEGORIES
+from app import get_all_warranties, search_warranties, generate_warranty_pdf, check_expiring_warranties, Image, io, CATEGORIES, render_notification_bell, render_pdf_preview
 
 if st.session_state.get("logged_in"):
-    cols = st.columns([1,1,1,1,1,1])
+    cols = st.columns([1,1,1,1,1,1,1])
     with cols[0]:
         if st.button("🏠 Home"):
             st.switch_page("app.py")
@@ -14,14 +14,7 @@ if st.session_state.get("logged_in"):
             st.rerun()
     with cols[3]:
         if st.button("📑 Export PDF"):
-            pdf_bytes = generate_warranty_pdf()
-            st.download_button(
-                label="Download PDF",
-                data=pdf_bytes,
-                file_name="warranty_report.pdf",
-                mime="application/pdf",
-                key="navbar_pdf"
-            )
+            st.session_state["pdf_preview_bytes"] = generate_warranty_pdf()
     with cols[4]:
         if st.button("📧 Mail Report"):
             check_expiring_warranties()
@@ -29,7 +22,27 @@ if st.session_state.get("logged_in"):
         if st.button("📤 Logout"):
             st.session_state.clear()
             st.rerun()
+    with cols[6]:
+        render_notification_bell()
     st.markdown("---")
+
+    if st.session_state.get("pdf_preview_bytes"):
+        st.write("### 📑 Warranty Report Preview")
+        render_pdf_preview(st.session_state["pdf_preview_bytes"])
+        dl_col, close_col, _ = st.columns([1, 1, 4])
+        with dl_col:
+            st.download_button(
+                label="Download PDF",
+                data=st.session_state["pdf_preview_bytes"],
+                file_name="warranty_report.pdf",
+                mime="application/pdf",
+                key="navbar_pdf"
+            )
+        with close_col:
+            if st.button("Close Preview"):
+                del st.session_state["pdf_preview_bytes"]
+                st.rerun()
+        st.markdown("---")
 st.title("My Warranties")
 
 if not st.session_state.get("logged_in"):

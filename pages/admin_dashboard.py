@@ -204,17 +204,26 @@ def send_admin_report():
     password = st.secrets["email"]["password"]
     
     email_body = """
-    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-        <div style="background-color: #2c3e50; padding: 20px; text-align: center; border-radius: 10px 10px 0 0;">
-            <h1 style="color: white;">Admin Report</h1>
-        </div>
-        <div style="padding: 20px; background-color: white; border-radius: 0 0 10px 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
-            <h2 style="color: #34495e;">System Overview</h2>
-            <p>Please find attached the following reports:</p>
-            <ul>
-                <li>Complete Users Report (PDF)</li>
-                <li>Complete Warranties Report (PDF)</li>
-            </ul>
+    <div style="font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; background-color: #eef1f8; padding: 32px 16px;">
+        <div style="background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 30px rgba(30,41,59,0.15);">
+            <div style="background: linear-gradient(135deg, #1e293b, #4f46e5); background-color: #1e293b; padding: 36px 24px; text-align: center;">
+                <div style="display: inline-block; width: 56px; height: 56px; line-height: 56px; background-color: rgba(255,255,255,0.15); border-radius: 50%; font-size: 26px; margin-bottom: 14px;">&#128737;</div>
+                <h1 style="color: #ffffff; font-size: 20px; margin: 0; font-weight: 600;">Admin Report</h1>
+                <p style="color: rgba(255,255,255,0.8); font-size: 13px; margin: 4px 0 0;">Warranty Management System</p>
+            </div>
+            <div style="padding: 28px 24px; color: #1f2937;">
+                <h2 style="color: #1e293b; font-size: 16px; margin: 0 0 12px;">System Overview</h2>
+                <p style="font-size: 14px; color: #374151; margin: 0 0 16px;">Please find attached the following reports:</p>
+                <div style="padding: 12px 16px; background-color: #f9fafb; border-radius: 10px; margin-bottom: 10px; border-left: 4px solid #4f46e5; font-size: 14px; color: #111827; font-weight: 600;">
+                    &#128100; Complete Users Report <span style="color: #6b7280; font-weight: 400;">(PDF)</span>
+                </div>
+                <div style="padding: 12px 16px; background-color: #f9fafb; border-radius: 10px; border-left: 4px solid #4f46e5; font-size: 14px; color: #111827; font-weight: 600;">
+                    &#128230; Complete Warranties Report <span style="color: #6b7280; font-weight: 400;">(PDF)</span>
+                </div>
+            </div>
+            <div style="text-align: center; padding: 4px 24px 28px;">
+                <p style="margin: 2px 0; font-size: 12px; color: #9ca3af;">This is an automated message, please do not reply to this email.</p>
+            </div>
         </div>
     </div>
     """
